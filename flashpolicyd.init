@@ -22,6 +22,7 @@ TIMEOUT=10
 XML=/etc/flashpolicy.xml
 LOGFREQ=1800
 LOGFILE=/var/log/flashpolicyd.log
+DAEMON_USER=nobody
 
 # Get service config - may override defaults
 [ -f /etc/sysconfig/flashpolicyd ] && . /etc/sysconfig/flashpolicyd
@@ -44,7 +45,7 @@ start() {
 	fi
 
 	msg_starting "Flash policy server"
-	daemon /usr/sbin/flashpolicyd --timeout=$TIMEOUT --xml=$XML --logfreq=$LOGFREQ --logfile=$LOGFILE
+	daemon /usr/sbin/flashpolicyd --user=$DAEMON_USER --timeout=$TIMEOUT --xml=$XML --logfreq=$LOGFREQ --logfile=$LOGFILE
 	RETVAL=$?
 	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/flashpolicyd
 }

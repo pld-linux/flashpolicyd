@@ -2,13 +2,14 @@
 Summary:	Daemon to serve Adobe Flash socket policy XML
 Name:		flashpolicyd
 Version:	2.1
-Release:	0.2
+Release:	0.3
 License:	GPL v2
 Group:		Networking/Daemons
 URL:		http://code.google.com/p/flashpolicyd/
 Source0:	http://flashpolicyd.googlecode.com/files/%{name}-%{version}.tgz
 # Source0-md5:	0ad1ed0b130cf5850d77600fab90a7c2
 Source1:	%{name}.init
+Patch0:		%{name}-runas-user.patch
 BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post,preun):	/sbin/chkconfig
 Requires:	rc-scripts
@@ -31,6 +32,7 @@ Nagios plugin to check flashpolicyd.
 
 %prep
 %setup -q
+%patch0 -p1
 mv doc rdoc
 
 cat > nagios.cfg <<'EOF'

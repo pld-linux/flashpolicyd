@@ -1,0 +1,45 @@
+--- flashpolicyd-2.1/flashpolicyd.rb	2009-10-08 00:11:42.000000000 +0300
++++ flashpolicyd-2.1/flashpolicyd~	2010-02-09 19:34:24.850284233 +0200
+@@ -60,6 +60,7 @@
+     [ '--verbose', '-v', GetoptLong::NO_ARGUMENT],
+     [ '--timeout', '-t', GetoptLong::OPTIONAL_ARGUMENT],
+     [ '--logfreq', '-l', GetoptLong::OPTIONAL_ARGUMENT],
++    [ '--user', '-u', GetoptLong::OPTIONAL_ARGUMENT],
+     [ '--logfile', GetoptLong::REQUIRED_ARGUMENT],
+     [ '--help', '-h', GetoptLong::NO_ARGUMENT]
+ )
+@@ -71,6 +72,7 @@
+ @logfreq = 1800
+ xmlfile = ""
+ logfile = ""
++user = ""
+ 
+ opts.each { |opt, arg|
+   case opt
+@@ -86,6 +88,8 @@
+       exit
+     when '--xml'
+       xmlfile = arg
++    when '--user'
++      user = arg
+     when '--verbose'
+       @verbose = true
+     when '--maxclients'
+@@ -393,6 +397,17 @@
+     server = PolicyServer.new(843, "0.0.0.0", @xmldata, @logger, @timeout, @verbose)
+     server.start
+ 
++	# change user after binding to port
++	if (user.length > 0)
++        require 'etc'
++		uid = Etc.getpwnam(user).uid
++		gid = Etc.getpwnam(user).gid
++        # Change process ownership
++        Process.initgroups(user, gid)
++        Process::GID.change_privilege(gid)
++        Process::UID.change_privilege(uid)
++    end
++
+     # Send HUP to toggle debug mode or not for a running server
+     trap("HUP") {
+       server.toggledebug
