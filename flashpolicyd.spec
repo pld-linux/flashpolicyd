@@ -2,12 +2,13 @@
 Summary:	Daemon to serve Adobe Flash socket policy XML
 Name:		flashpolicyd
 Version:	2.1
-Release:	0.1
+Release:	0.2
 License:	GPL v2
 Group:		Networking/Daemons
 URL:		http://code.google.com/p/flashpolicyd/
 Source0:	http://flashpolicyd.googlecode.com/files/%{name}-%{version}.tgz
 # Source0-md5:	0ad1ed0b130cf5850d77600fab90a7c2
+Source1:	%{name}.init
 BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post,preun):	/sbin/chkconfig
 Requires:	rc-scripts
@@ -44,7 +45,7 @@ EOF
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sbindir}}
-install -p flashpolicyd.init $RPM_BUILD_ROOT/etc/rc.d/init.d/flashpolicyd
+install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/flashpolicyd
 install -p flashpolicyd.rb $RPM_BUILD_ROOT%{_sbindir}/flashpolicyd
 cp -a flashpolicy.xml $RPM_BUILD_ROOT%{_sysconfdir}/flashpolicy.xml
 

@@ -1,0 +1,103 @@
+#!/bin/sh
+#
+# flashpolicyd	flashpolicyd short service description
+#
+# chkconfig:	345 20 20
+#
+# description: Starts a server on port 843 to server flash policy requests
+#
+# processname:	flashpolicyd
+# config: /etc/flashpolicy.xml
+#
+# $Id$
+
+# Source function library
+. /etc/rc.d/init.d/functions
+
+# Get network config
+. /etc/sysconfig/network
+
+# Set defaults
+TIMEOUT=10
+XML=/etc/flashpolicy.xml
+LOGFREQ=1800
+LOGFILE=/var/log/flashpolicyd.log
+
+# Get service config - may override defaults
+[ -f /etc/sysconfig/flashpolicyd ] && . /etc/sysconfig/flashpolicyd
+
+# Check that networking is up.
+if is_yes "${NETWORKING}"; then
+	if [ ! -f /var/lock/subsys/network -a "$1" != stop -a "$1" != status ]; then
+		msg_network_down "Flash policy server"
+		exit 1
+	fi
+else
+	exit 0
+fi
+
+start() {
+	# Check if the service is already running?
+	if [ -f /var/lock/subsys/flashpolicyd ]; then
+		msg_already_running "Flash policy server"
+		return
+	fi
+
+	msg_starting "Flash policy server"
+	daemon /usr/sbin/flashpolicyd --timeout=$TIMEOUT --xml=$XML --logfreq=$LOGFREQ --logfile=$LOGFILE
+	RETVAL=$?
+	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/flashpolicyd
+}
+
+stop() {
+	if [ ! -f /var/lock/subsys/flashpolicyd ]; then
+		msg_not_running "Flash policy server"
+		return
+	fi
+
+	# Stop daemons.
+	msg_stopping "Flash policy server"
+	killproc flashpolicyd
+	rm -f /var/lock/subsys/flashpolicyd
+}
+
+condrestart() {
+	if [ ! -f /var/lock/subsys/flashpolicyd ]; then
+		msg_not_running "Flash policy server"
+		RETVAL=$1
+		return
+	fi
+
+	stop
+	start
+}
+
+RETVAL=0
+# See how we were called.
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
+	;;
+  restart)
+	stop
+	start
+	;;
+  try-restart)
+	condrestart 0
+	;;
+  force-reload)
+	condrestart 7
+	;;
+  status)
+	status flashpolicyd
+	RETVAL=$?
+	;;
+  *)
+	msg_usage "$0 {start|stop|restart|try-restart|reload|force-reload|status}"
+	exit 3
+esac
+
+exit $RETVAL
