@@ -1,3 +1,9 @@
+Patch to make flashpolicyd to run as user nobody/nobody with --user nobody
+argument.
+
+--
+Signed-off-by: Elan Ruusamäe <glen@delfi.ee>
+
 --- flashpolicyd-2.1/flashpolicyd.rb	2009-10-08 00:11:42.000000000 +0300
 +++ flashpolicyd-2.1/flashpolicyd~	2010-02-09 19:34:24.850284233 +0200
 @@ -60,6 +60,7 @@
@@ -29,11 +35,11 @@
      server = PolicyServer.new(843, "0.0.0.0", @xmldata, @logger, @timeout, @verbose)
      server.start
  
-+	# change user after binding to port
-+	if (user.length > 0)
++   # change user after binding to port
++   if (user.length > 0)
 +        require 'etc'
-+		uid = Etc.getpwnam(user).uid
-+		gid = Etc.getpwnam(user).gid
++        uid = Etc.getpwnam(user).uid
++        gid = Etc.getpwnam(user).gid
 +        # Change process ownership
 +        Process.initgroups(user, gid)
 +        Process::GID.change_privilege(gid)
