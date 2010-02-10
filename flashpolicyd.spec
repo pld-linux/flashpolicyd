@@ -2,7 +2,7 @@
 Summary:	Daemon to serve Adobe Flash socket policy XML
 Name:		flashpolicyd
 Version:	2.1
-Release:	1
+Release:	2
 License:	GPL v2
 Group:		Networking/Daemons
 URL:		http://code.google.com/p/flashpolicyd/
@@ -13,6 +13,7 @@ Patch0:		%{name}-runas-user.patch
 BuildRequires:	rpmbuild(macros) >= 1.268
 Requires(post,preun):	/sbin/chkconfig
 Requires:	rc-scripts
+Requires:	ruby-modules
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
