@@ -31,6 +31,18 @@ Requires:	ruby >= 1:1.8.7-4
 %description rdoc
 Documentation files for flashpolicyd.
 
+%package ri
+Summary:	ri documentation for flashpolicyd
+Summary(pl.UTF-8):	Dokumentacja w formacie ri dla flashpolicyd
+Group:		Documentation
+Requires:	ruby
+
+%description ri
+ri documentation for flashpolicyd.
+
+%description ri -l pl.UTF-8
+Dokumentacji w formacie ri dla flashpolicyd.
+
 %package -n nagios-plugin-%{plugin}
 Summary:	Nagios plugin to check flashpolicyd
 Group:		Networking
@@ -42,8 +54,8 @@ Nagios plugin to check flashpolicyd.
 %prep
 %setup -q
 %patch0 -p1
-mv doc rdoc
-rm rdoc/created.rid
+# we regenerate rdoc our own
+rm -rf doc
 
 cat > nagios.cfg <<'EOF'
 # Usage:
@@ -66,6 +78,11 @@ define service {
 }
 EOF
 
+%build
+rdoc --ri --op ri --title 'Flash Policy Daemon version %{version}' flashpolicyd.rb check_flashpolicyd.rb
+rdoc --op rdoc --title 'Flash Policy Daemon version %{version}' flashpolicyd.rb check_flashpolicyd.rb
+rm ri/created.rid
+
 %install
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sbindir}}
@@ -73,9 +90,10 @@ install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/flashpolicyd
 install -p flashpolicyd.rb $RPM_BUILD_ROOT%{_sbindir}/flashpolicyd
 cp -a flashpolicy.xml $RPM_BUILD_ROOT%{_sysconfdir}/flashpolicy.xml
 
-# rdoc
-install -d $RPM_BUILD_ROOT%{ruby_rdocdir}
+# rdoc/ri
+install -d $RPM_BUILD_ROOT{%{ruby_ridir},%{ruby_rdocdir}}
 cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
+cp -a ri/* $RPM_BUILD_ROOT%{ruby_ridir}
 
 install -d $RPM_BUILD_ROOT{%{pluginconf},%{plugindir}}
 cp -a nagios.cfg $RPM_BUILD_ROOT%{pluginconf}/%{plugin}.cfg
@@ -104,6 +122,10 @@ fi
 %files rdoc
 %defattr(644,root,root,755)
 %{ruby_rdocdir}/%{name}-%{version}
+
+%files ri
+%defattr(644,root,root,755)
+%{ruby_ridir}/PolicyServer
 
 %files -n nagios-plugin-%{plugin}
 %defattr(644,root,root,755)
