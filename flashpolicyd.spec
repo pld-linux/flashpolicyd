@@ -2,7 +2,7 @@
 Summary:	Daemon to serve Adobe Flash socket policy XML
 Name:		flashpolicyd
 Version:	2.1
-Release:	2
+Release:	3
 License:	GPL v2
 Group:		Networking/Daemons
 URL:		http://code.google.com/p/flashpolicyd/
@@ -23,6 +23,14 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 %description
 Daemon to serve Adobe Flash socket policy XML.
 
+%package rdoc
+Summary:	Documentation files for flashpolicyd
+Group:		Documentation
+Requires:	ruby >= 1:1.8.7-4
+
+%description rdoc
+Documentation files for flashpolicyd.
+
 %package -n nagios-plugin-%{plugin}
 Summary:	Nagios plugin to check flashpolicyd
 Group:		Networking
@@ -35,6 +43,7 @@ Nagios plugin to check flashpolicyd.
 %setup -q
 %patch0 -p1
 mv doc rdoc
+rm rdoc/created.rid
 
 cat > nagios.cfg <<'EOF'
 # Usage:
@@ -42,6 +51,18 @@ cat > nagios.cfg <<'EOF'
 define command {
 	command_name    %{plugin}
 	command_line    %{plugindir}/%{plugin} --host $HOSTADDRESS$ $ARG1$
+}
+
+define service {
+	use                     generic-service
+	name                    flashpolicyd
+	service_description     flashpolicyd
+	register                0
+
+	normal_check_interval   5
+	retry_check_interval    1
+
+	check_command           check_flashpolicyd
 }
 EOF
 
@@ -51,6 +72,10 @@ install -d $RPM_BUILD_ROOT{/etc/{sysconfig,rc.d/init.d},%{_sbindir}}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/flashpolicyd
 install -p flashpolicyd.rb $RPM_BUILD_ROOT%{_sbindir}/flashpolicyd
 cp -a flashpolicy.xml $RPM_BUILD_ROOT%{_sysconfdir}/flashpolicy.xml
+
+# rdoc
+install -d $RPM_BUILD_ROOT%{ruby_rdocdir}
+cp -a rdoc $RPM_BUILD_ROOT%{ruby_rdocdir}/%{name}-%{version}
 
 install -d $RPM_BUILD_ROOT{%{pluginconf},%{plugindir}}
 cp -a nagios.cfg $RPM_BUILD_ROOT%{pluginconf}/%{plugin}.cfg
@@ -71,10 +96,14 @@ fi
 
 %files
 %defattr(644,root,root,755)
-%doc README rdoc
+%doc README
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/flashpolicy.xml
 %attr(754,root,root) /etc/rc.d/init.d/flashpolicyd
 %attr(755,root,root) %{_sbindir}/flashpolicyd
+
+%files rdoc
+%defattr(644,root,root,755)
+%{ruby_rdocdir}/%{name}-%{version}
 
 %files -n nagios-plugin-%{plugin}
 %defattr(644,root,root,755)
