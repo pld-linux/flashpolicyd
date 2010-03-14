@@ -11,6 +11,7 @@ Source0:	http://flashpolicyd.googlecode.com/files/%{name}-%{version}.tgz
 Source1:	%{name}.init
 Patch0:		%{name}-runas-user.patch
 BuildRequires:	rpmbuild(macros) >= 1.268
+BuildRequires:	ruby-modules
 Requires(post,preun):	/sbin/chkconfig
 Requires:	rc-scripts
 Requires:	ruby-modules
