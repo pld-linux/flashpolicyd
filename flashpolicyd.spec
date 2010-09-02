@@ -2,7 +2,7 @@
 Summary:	Daemon to serve Adobe Flash socket policy XML
 Name:		flashpolicyd
 Version:	2.1
-Release:	4
+Release:	5
 License:	GPL v2
 Group:		Networking/Daemons
 URL:		http://code.google.com/p/flashpolicyd/
