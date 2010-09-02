@@ -2,7 +2,7 @@
 #
 # flashpolicyd	flashpolicyd short service description
 #
-# chkconfig:	345 20 20
+# chkconfig:	345 20 80
 #
 # description: Starts a server on port 843 to server flash policy requests
 #
