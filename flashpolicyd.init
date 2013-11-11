@@ -9,7 +9,6 @@
 # processname:	flashpolicyd
 # config: /etc/flashpolicy.xml
 #
-# $Id$
 
 # Source function library
 . /etc/rc.d/init.d/functions

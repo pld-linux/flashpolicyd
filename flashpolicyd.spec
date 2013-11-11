@@ -1,15 +1,14 @@
 %define		plugin	check_flashpolicyd
 Summary:	Daemon to serve Adobe Flash socket policy XML
 Name:		flashpolicyd
-Version:	2.1
-Release:	6
-License:	GPL v2
+Version:	2.2
+Release:	1
+License:	ASL 2.0
 Group:		Networking/Daemons
-URL:		http://code.google.com/p/flashpolicyd/
-Source0:	http://flashpolicyd.googlecode.com/files/%{name}-%{version}.tgz
-# Source0-md5:	0ad1ed0b130cf5850d77600fab90a7c2
+Source0:	https://github.com/ripienaar/flashpolicyd/archive/%{version}/%{name}-%{version}.tar.gz
+# Source0-md5:	0113f5ca4a2b5677da37a0a66d48bc34
 Source1:	%{name}.init
-Patch0:		%{name}-runas-user.patch
+URL:		http://code.google.com/p/flashpolicyd/
 BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	ruby-modules
 Requires(post,preun):	/sbin/chkconfig
@@ -54,9 +53,6 @@ Nagios plugin to check flashpolicyd.
 
 %prep
 %setup -q
-%patch0 -p1
-# we regenerate rdoc our own
-rm -rf doc
 
 cat > nagios.cfg <<'EOF'
 # Usage:
@@ -82,6 +78,11 @@ EOF
 %build
 rdoc --ri --op ri --title 'Flash Policy Daemon version %{version}' flashpolicyd.rb check_flashpolicyd.rb
 rdoc --op rdoc --title 'Flash Policy Daemon version %{version}' flashpolicyd.rb check_flashpolicyd.rb
+rm ri/Object/cdesc-Object.ri
+rm ri/Object/run_server-i.ri
+rm ri/Object/sec2dhms-i.ri
+rm ri/Object/showhelp-i.ri
+rm ri/cache.ri
 rm ri/created.rid
 
 %install
